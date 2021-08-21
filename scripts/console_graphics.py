@@ -1,3 +1,4 @@
+#I know the code is awful-
 from rich import markdown
 from rich.console import Console
 from rich.markdown import Markdown
