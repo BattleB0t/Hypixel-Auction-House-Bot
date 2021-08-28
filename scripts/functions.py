@@ -1,5 +1,11 @@
 #This is the random scripts that are used by the program.
 
+"""
+THINGS TO DO:
+get a list of reforges.
+
+"""
+
 import json
 import threading
 import pyperclip
@@ -23,16 +29,22 @@ def request_all_pages():
 
 
 #THIS HAS NOT BEEN TESTED, THIS IS LIKELY FULL OF BUGS
-"""
-THINGS TO DO:
-get a list of reforges.
 
-"""
+data_set = {}
+
+def add_data_to_set(item_data):
+    if item_data["starting_price"] in data_set[item_data["item_name"]]["price"]:
+        try:
+            data_set[item_data["item_name"]]["price"][item_data["starting_price"]].append(item_data)
+        except:
+            print("ERROR: Failed to add duplicate item to set.")
+    else:
+        data_set[item_data["item_name"]]["price"][item_data["starting_price"]] = [item_data]
+
 
 reforges = ["PLACEHOLDER"]
 
-##Wow this was kinda tricky to make
-def scrape_item_data(item_str, bin_bool, uuid):
+def scrape_item_data(item_str, bin_bool, uuid, starting_price):
     item_str = remove_spaces(item_str)
     #This is to stop bugs when formatting, removing spaces i found was the easiest way to fix some of my issues.
 
@@ -63,7 +75,7 @@ def scrape_item_data(item_str, bin_bool, uuid):
     
     if "[Lvl" in item_str:
         lvl_suffix_pointer = 3
-        while lvl_suffix_pointer >= 0:
+        while lvl_suffix_pointer > 0:
             try:
                 present_lvl = int(list_to_string(list(item_str)[4:4+lvl_suffix_pointer]))
                 item_str = item_str.replace(f"[Lvl{present_lvl}]", "")
@@ -74,11 +86,10 @@ def scrape_item_data(item_str, bin_bool, uuid):
             
     
     
-    print({"item_name":item_str, "reforge":present_reforge, "stars":present_stars, "lvl":present_lvl, "bin":bin_bool}) #Lvl is only used by certain items and should be ignored most of the time.
+    add_data_to_set({"item_name":item_str, "reforge":present_reforge, "stars":present_stars, "lvl":present_lvl, "bin":bin_bool, "starting_price":starting_price, "auctionID":uuid}) #Lvl is only used by certain items and should be ignored most of the time.
 
 
 def parse_all_page_data(all_page_data):
-    item_data = {}
 
     for key in all_page_data:
         current_page = all_page_data[key]
@@ -90,7 +101,7 @@ def parse_all_page_data(all_page_data):
             except:
                 pass
             
-            threading.Thread(target=scrape_item_data, args=(auction["item_name"], auc_bin, auction["uuid"])).start()
+            threading.Thread(target=scrape_item_data, args=(auction["item_name"], auc_bin, auction["uuid"], auction["starting_bid"])).start()
 
 
 
