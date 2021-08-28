@@ -1,9 +1,21 @@
 #This is the random scripts that are used by the program.
 
 import json
+import threading
+import pyperclip
 
 import scripts.api_functions
 import scripts.api
+
+def list_to_string(list_data):
+    lts = "".join(map(str,list_data))
+    return lts
+
+def remove_spaces(string):
+    for space_count in range(string.count(" ")):
+        string = string.replace(" ", "")
+    return string
+
 
 def request_all_pages():
     urls = scripts.api_functions.compile_all_urls()
@@ -11,23 +23,75 @@ def request_all_pages():
 
 
 #THIS HAS NOT BEEN TESTED, THIS IS LIKELY FULL OF BUGS
+"""
+THINGS TO DO:
+get a list of reforges.
+
+"""
+
+reforges = ["PLACEHOLDER"]
+
+##Wow this was kinda tricky to make
+def scrape_item_data(item_str, bin_bool, uuid):
+    item_str = remove_spaces(item_str)
+    #This is to stop bugs when formatting, removing spaces i found was the easiest way to fix some of my issues.
+
+    remove_bins = True
+    if bin_bool == False:
+        if remove_bins == True:
+            return
+
+    present_reforge = ""
+    present_stars = 0
+    present_lvl = 0
+
+
+
+    if any(reforge in item_str for reforge in reforges) == True:
+        reforge_present = True
+        
+        for reforge in reforges:
+            if reforge in item_str:
+                present_reforge = reforge
+                break
+
+
+
+    if "✪" in item_str:
+        present_stars = item_str.count("✪")
+        item_str = item_str.replace("✪"*present_stars, "")
+    
+    if "[Lvl" in item_str:
+        lvl_suffix_pointer = 3
+        while lvl_suffix_pointer >= 0:
+            try:
+                present_lvl = int(list_to_string(list(item_str)[4:4+lvl_suffix_pointer]))
+                item_str = item_str.replace(f"[Lvl{present_lvl}]", "")
+                break
+            except:
+                lvl_suffix_pointer -= 1
+
+            
+    
+    
+    print({"item_name":item_str, "reforge":present_reforge, "stars":present_stars, "lvl":present_lvl, "bin":bin_bool}) #Lvl is only used by certain items and should be ignored most of the time.
+
+
 def parse_all_page_data(all_page_data):
-    parsed_data = {}
+    item_data = {}
 
     for key in all_page_data:
-        print(key)
         current_page = all_page_data[key]
 
         for auction in current_page["auctions"]:
-            #{"tier":auction["tier"], "starting_price":auction["starting_bid"], "bin":auction["bin"], "uuid":auction["uuid"], "auctioneer":auction["auctioneer"]}
+            auc_bin = False
+            try: #If an auction is not a bin it does not have the bin key.
+                auc_bin = auction["bin"]
+            except:
+                pass
             
-            if auction["item_name"] in parsed_data:
-                auction["item_name"].append({"tier":auction["tier"], "starting_price":auction["starting_bid"], "bin":auction["bin"], "uuid":auction["uuid"], "auctioneer":auction["auctioneer"]})
+            threading.Thread(target=scrape_item_data, args=(auction["item_name"], auc_bin, auction["uuid"])).start()
 
-            else:
-                auction["item_name"] = []
-                auction["item_name"].append({"tier":auction["tier"], "starting_price":auction["starting_bid"], "bin":auction["bin"], "uuid":auction["uuid"], "auctioneer":auction["auctioneer"]})
-            
 
 
 
@@ -41,3 +105,6 @@ def read_from_json(filepath):
     with open(filepath, 'r') as openfile:
         json_object = json.load(openfile)
     return json_object
+
+def load_to_clipboard(item_to_load):
+    pyperclip.copy(item_to_load)
