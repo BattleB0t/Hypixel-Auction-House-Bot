@@ -1,6 +1,8 @@
 ##This is the main script.
 import scripts.functions
 
+from pprint import pprint
+
 def main():
     #Loading all page data
     
@@ -14,6 +16,8 @@ def main():
     page_data = scripts.functions.read_from_json("data.json")
 
     scripts.functions.parse_all_page_data(page_data)
+
+    scripts.functions.save_as_json(scripts.functions.data_set, "formatted_data.json")
 
 if __name__ == "__main__":
     main()
