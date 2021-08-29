@@ -8,6 +8,8 @@ async def request(url):
 
 def many_requests(urls): #URLs must be a list.
     responses = {}
-    for url, url_num in urls, len(urls):
-        responses[f"page{url_num}"] = asyncio.run(request(url))
+    page_incrimentor = 0
+    for url in urls:
+        responses[f"page{page_incrimentor}"] = asyncio.run(request(url))
+        page_incrimentor += 1
     return responses
