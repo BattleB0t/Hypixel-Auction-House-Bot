@@ -30,11 +30,13 @@ def request_all_pages():
 
 #THIS HAS NOT BEEN TESTED, THIS IS LIKELY FULL OF BUGS
 
-def compare_two_lowest_prices(data_set_page):
-    first_lowest_val = find_smallest_value(data_set_page)
-    second_lowest_val = find_smallest_value(data_set_page.remove(first_lowest_val))
-    return first_lowest_val, second_lowest_val
+def get_two_lowest_values(item_name): #Item_name page is the str value of the item we want to call.
+    keys = data_set[item_name].keys()
+    keys = list(map(int, keys))
+    print(keys)
+    print(min(keys))   
 
+    
 
 def find_smallest_value(data_set_page): #Data_set_page is the page of an entire item_name.
     lowest_value = min(data_set_page)
@@ -109,9 +111,6 @@ def parse_all_page_data(all_page_data):
                 pass
             
             threading.Thread(target=scrape_item_data, args=(auction["item_name"], auc_bin, auction["uuid"], auction["starting_bid"])).start()
-
-
-
 
 def save_as_json(data, filepath, opentype="w"):
     json_object = json.dumps(data)
