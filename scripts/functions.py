@@ -30,16 +30,25 @@ def request_all_pages():
 
 #THIS HAS NOT BEEN TESTED, THIS IS LIKELY FULL OF BUGS
 
+def compare_two_lowest_prices(data_set_page):
+    first_lowest_val = find_smallest_value(data_set_page)
+    second_lowest_val = find_smallest_value(data_set_page.remove(first_lowest_val))
+    return first_lowest_val, second_lowest_val
+
+
+def find_smallest_value(data_set_page): #Data_set_page is the page of an entire item_name.
+    lowest_value = min(data_set_page)
+    return lowest_value
+
 data_set = {}
 
 def add_data_to_set(item_data):
-    if item_data["starting_price"] in data_set[item_data["item_name"]]["price"]:
-        try:
-            data_set[item_data["item_name"]]["price"][item_data["starting_price"]].append(item_data)
-        except:
-            print("ERROR: Failed to add duplicate item to set.")
+    if item_data["item_name"] in data_set:
+        data_set[item_data["item_name"]][item_data["starting_price"]] = item_data
     else:
-        data_set[item_data["item_name"]]["price"][item_data["starting_price"]] = [item_data]
+        data_set[item_data["item_name"]] = {item_data["starting_price"]:item_data}
+
+
 
 
 reforges = ["PLACEHOLDER"]
@@ -83,8 +92,6 @@ def scrape_item_data(item_str, bin_bool, uuid, starting_price):
             except:
                 lvl_suffix_pointer -= 1
 
-            
-    
     
     add_data_to_set({"item_name":item_str, "reforge":present_reforge, "stars":present_stars, "lvl":present_lvl, "bin":bin_bool, "starting_price":starting_price, "auctionID":uuid}) #Lvl is only used by certain items and should be ignored most of the time.
 
