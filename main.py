@@ -6,23 +6,38 @@ from pprint import pprint
 def main():
     #Loading all page data
     
-    page_data = scripts.functions.request_all_pages()
-    
-    scripts.functions.save_as_json(page_data, "data.json")
+    #EVERYTHING PAST THIS POINT IS JUST TEST/EXAMPLE CODE:
+    if scripts.functions.file_search("data.json") == False:
+        page_data = scripts.functions.request_all_pages()
+        
+        scripts.functions.save_as_json(page_data, "data.json")
 
+    else:
+        page_data = scripts.functions.read_from_json("data.json")
 
-    #page_data = scripts.functions.read_from_json("data.json")
-
-    scripts.functions.parse_all_page_data(page_data)
+        scripts.functions.parse_all_page_data(page_data)
 
     scripts.functions.save_as_json(scripts.functions.data_set, "formatted_data.json")
 
-    
+    item_data_formatted = scripts.functions.format_flip_data()
 
-    for page in scripts.functions.data_set:
-        scripts.functions.get_two_lowest_values(page)
-        
-        
+
+    margin_avarage = 0
+
+    for item in item_data_formatted:
+        margin_avarage += item_data_formatted[item]["margins"]
+    
+    margin_avarage = margin_avarage/len(item_data_formatted)
+
+    for item in item_data_formatted:
+        print(f"\033[1;37;40m{item}\033[0;37;40m")
+
+        if item_data_formatted[item]['margins'] > margin_avarage:
+            print(f"\033[1;34;40mMargins: {item_data_formatted[item]['margins']}\n")
+
+        else:
+            print(f"\033[1;31;40mMargins: {item_data_formatted[item]['margins']}\n")
+
 
 if __name__ == "__main__":
     main()

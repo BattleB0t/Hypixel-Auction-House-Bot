@@ -6,6 +6,7 @@ get a list of reforges.
 
 """
 
+import os
 import json
 import threading
 import pyperclip
@@ -30,12 +31,37 @@ def request_all_pages():
 
 #THIS HAS NOT BEEN TESTED, THIS IS LIKELY FULL OF BUGS
 
+def format_flip_data():
+    formatted_data = {}
+    for item_name in data_set:
+        vals = scripts.functions.get_two_lowest_values(item_name)
+        
+        if len(vals) == 2:
+            formatted_data[item_name] = {}
+            formatted_data[item_name]["name"] = item_name #Idk why i put this here, i guess it could help me in the future ?????
+            formatted_data[item_name]["lp"] = vals[0]
+            formatted_data[item_name]["slp"] = vals[1]
+            formatted_data[item_name]["margins"] = vals[1] - vals[0]
+
+    return formatted_data
+
 def get_two_lowest_values(item_name): #Item_name page is the str value of the item we want to call.
     keys = data_set[item_name].keys()
     keys = list(map(int, keys))
-    print(keys)
-    print(min(keys))   
+    return_values = {}
 
+    for val_id in range(2):
+        try:
+            return_values[val_id] = min(keys)
+        except:
+            break #No more keys.
+        
+        try:
+            keys.remove(min(keys))
+        except:
+            break #No more keys.
+
+    return return_values
     
 
 def find_smallest_value(data_set_page): #Data_set_page is the page of an entire item_name.
@@ -125,3 +151,6 @@ def read_from_json(filepath):
 
 def load_to_clipboard(item_to_load):
     pyperclip.copy(item_to_load)
+
+def file_search(file_path):
+    return os.path.isfile(file_path)

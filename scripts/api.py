@@ -1,15 +1,20 @@
 #This script contains all the api request code.
 import requests
-import asyncio
+import threading
 
-async def request(url):
+
+def request(url):
     print(f"downloading: {url}")
     return requests.get(url).json()
 
+def request_and_page(url, page_incrimentor):
+    responses[f"page{page_incrimentor}"] = request(url)
+
 def many_requests(urls): #URLs must be a list.
-    responses = {}
+    global responses
+    responses = {}    
     page_incrimentor = 0
     for url in urls:
-        responses[f"page{page_incrimentor}"] = asyncio.run(request(url))
+        threading.Thread(target=request_and_page, args=(url, page_incrimentor)).start()
         page_incrimentor += 1
     return responses
