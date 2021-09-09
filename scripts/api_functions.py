@@ -1,5 +1,4 @@
 #Handles the api functions needed to manipulate that data.
-import asyncio
 
 import scripts.api
 
@@ -7,7 +6,7 @@ additional_data = {} #You're going to need to add an api key to this by using ad
 
 #auction md collects the auction houses meta data.
 def auction_md():
-    data = asyncio.run(scripts.api.request("https://api.hypixel.net/skyblock/auctions"))
+    data = scripts.api.request("https://api.hypixel.net/skyblock/auctions")
     return {"success":data["success"], "totalPages":data["totalPages"], "totalAuctions":data["totalAuctions"]}
 
 #This formats the Urls by filling in placeholders with their real values.
@@ -25,4 +24,6 @@ def compile_all_urls():
     for page_num in range(auction_meta_data["totalPages"]):
         additional_data["PAGENUM"] = page_num
         urls.append(format_url("https://api.hypixel.net/skyblock/auctions?key=APIKEY&page=PAGENUM"))
+    
+    print(f"Pages: {auction_meta_data['totalPages']}")
     return urls
