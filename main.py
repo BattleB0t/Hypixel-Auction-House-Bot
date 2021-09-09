@@ -1,21 +1,25 @@
 ##This is the main script.
 import scripts.functions
 
-from pprint import pprint
+import time
 
 def main():
     #Loading all page data
     
     #EVERYTHING PAST THIS POINT IS JUST TEST/EXAMPLE CODE:
     if scripts.functions.file_search("data.json") == False:
+        print("Requesting Pages")
         page_data = scripts.functions.request_all_pages()
-        
+        print("Requested Pages")
+        time.sleep(4)
         scripts.functions.save_as_json(page_data, "data.json")
+        print("Saving Data To Json")
 
     else:
         page_data = scripts.functions.read_from_json("data.json")
 
-        scripts.functions.parse_all_page_data(page_data)
+    
+    scripts.functions.parse_all_page_data(page_data)
 
     scripts.functions.save_as_json(scripts.functions.data_set, "formatted_data.json")
 
